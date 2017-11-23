@@ -1,0 +1,7 @@
+{
+	"auth": "auth.json",
+	"commands": {
+		"hello": "plugins/hello.py"
+	},
+	"format": "/pearl"
+}
