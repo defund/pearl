@@ -30,12 +30,12 @@ class Pearl:
 	def load_commands(self):
 		self.pattern = re.compile('^' + self.config['format'] + ' [a-zA-Z0-9_]')
 		self.commands = {}
-		for command in self.config['commands']:
-			path = os.path.join(os.getcwd(), self.config['commands'][command])
-			spec = importlib.util.spec_from_file_location(command, path)
+		for plugin in self.config['plugins']:
+			path = os.path.join(os.getcwd(), self.config['plugins'][plugin])
+			spec = importlib.util.spec_from_file_location(plugin, path)
 			handler = importlib.util.module_from_spec(spec)
 			spec.loader.exec_module(handler)
-			self.commands[command] = handler.initialize(self.client)
+			self.commands[plugin] = handler.initialize(self.client)
 
 	def run(self):
 		self.client.on_connect.add_observer(self.initialize)

@@ -1,6 +1,6 @@
 {
 	"auth": "auth.json",
-	"commands": {
+	"plugins": {
 		"hello": "plugins/hello.py"
 	},
 	"format": "/pearl"
