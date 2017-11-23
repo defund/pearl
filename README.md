@@ -11,6 +11,8 @@ Pearl also requires a Gmail account. This is specified by `auth.json`, which you
 	"password": "pearlbot"
 }
 ```
+If you choose to fork this repository, make sure to add your filename to `.gitignore`. `auth.json` is already included.
+
 `config.json` has additional settings for Pearl:
 * `auth` - Filepath to `auth.json`.
 * `plugins` - List of plugins. The key value is command name and the value is the filepath to the plugin file.
