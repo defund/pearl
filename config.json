@@ -2,6 +2,7 @@
 	"auth": "auth.json",
 	"commands": {
 		"hello": "plugins/hello.py"
+		"dog": "plugins/dog.py"
 	},
 	"format": "/pearl"
 }
