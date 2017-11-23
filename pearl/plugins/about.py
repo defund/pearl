@@ -2,7 +2,8 @@ import asyncio
 
 import hangups
 
-class Hello:
+class About:
+	about = 'Pearl is a bot framework for Google Hangouts. You can view source code at https://github.com/defund/pearl. Thanks!'
 
 	def __init__(self, pearl):
 		self.pearl = pearl
@@ -10,12 +11,6 @@ class Hello:
 
 	@asyncio.coroutine
 	def handle(self, args, event):
-		hello = 'Hello!'
-		gaia_id = event.sender_id.gaia_id
-		for user in self.pearl.users.get_all():
-			if user.id_.gaia_id == gaia_id:
-				hello = 'Hello ' + user.full_name.split()[0] + '!'
-		
 		request = hangups.hangouts_pb2.SendChatMessageRequest(
 			request_header=self.client.get_request_header(),
 			event_request_header=hangups.hangouts_pb2.EventRequestHeader(
@@ -26,11 +21,11 @@ class Hello:
 			),
 			message_content=hangups.hangouts_pb2.MessageContent(
 				segment=[
-					hangups.ChatMessageSegment(hello).serialize()
+					hangups.ChatMessageSegment(self.about).serialize()
 				],
 			),
 		)
 		yield from self.client.send_chat_message(request)
 
 def initialize(client):
-	return Hello(client)
+	return About(client)

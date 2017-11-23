@@ -7,15 +7,16 @@ class Hello:
 	def __init__(self, pearl):
 		self.pearl = pearl
 		self.client = pearl.client
+		self.build()
+
+	def build(self):
+		usage_help = 'Usage: ' + self.pearl.config['format'] + ' command<br>Commands:'
+		for plugin in self.pearl.config['plugins']:
+			usage_help += '<br><b>' + plugin + '</b>: ' + self.pearl.config['plugins'][plugin]['help']
+		self.usage_help = hangups.ChatMessageSegment.from_str(usage_help)
 
 	@asyncio.coroutine
 	def handle(self, args, event):
-		hello = 'Hello!'
-		gaia_id = event.sender_id.gaia_id
-		for user in self.pearl.users.get_all():
-			if user.id_.gaia_id == gaia_id:
-				hello = 'Hello ' + user.full_name.split()[0] + '!'
-		
 		request = hangups.hangouts_pb2.SendChatMessageRequest(
 			request_header=self.client.get_request_header(),
 			event_request_header=hangups.hangouts_pb2.EventRequestHeader(
@@ -25,9 +26,7 @@ class Hello:
 				client_generated_id=self.client.get_client_generated_id(),
 			),
 			message_content=hangups.hangouts_pb2.MessageContent(
-				segment=[
-					hangups.ChatMessageSegment(hello).serialize()
-				],
+				segment=[seg.serialize() for seg in self.usage_help]
 			),
 		)
 		yield from self.client.send_chat_message(request)

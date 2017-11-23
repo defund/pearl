@@ -1,7 +1,18 @@
 {
 	"auth": "auth.json",
+	"format": "/pearl",
 	"plugins": {
-		"hello": "plugins/hello.py"
-	},
-	"format": "/pearl"
+		"about": {
+			"path": "plugins/about.py",
+			"help": "Display general information"
+		},
+		"hello": {
+			"path": "plugins/hello.py",
+			"help": "Pearl greets you!"
+		},
+		"help": {
+			"path": "plugins/help.py",
+			"help": "View this menu"
+		}
+	}
 }

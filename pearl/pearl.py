@@ -31,11 +31,11 @@ class Pearl:
 		self.pattern = re.compile('^' + self.config['format'] + ' [a-zA-Z0-9_]')
 		self.commands = {}
 		for plugin in self.config['plugins']:
-			path = os.path.join(os.getcwd(), self.config['plugins'][plugin])
+			path = os.path.join(os.getcwd(), self.config['plugins'][plugin]['path'])
 			spec = importlib.util.spec_from_file_location(plugin, path)
 			handler = importlib.util.module_from_spec(spec)
 			spec.loader.exec_module(handler)
-			self.commands[plugin] = handler.initialize(self.client)
+			self.commands[plugin] = handler.initialize(self)
 
 	def run(self):
 		self.client.on_connect.add_observer(self.initialize)
@@ -59,6 +59,6 @@ class Pearl:
 	def execute(self, message, event):
 		args = message.split()
 		if args[1] in self.commands.keys():
-			asyncio.run_coroutine_threadsafe(self.commands[args[1]].handle(self, args[2:], event), self.loop)
+			asyncio.run_coroutine_threadsafe(self.commands[args[1]].handle(args[2:], event), self.loop)
 
 Pearl().run()

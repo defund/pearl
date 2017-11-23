@@ -4,7 +4,7 @@ Pearl is a lightweight framework for making Google Hangouts bots. It is structur
 # Setup
 Setting up Pearl is incredibly easy. First, install dependencies with `pip install -r requirements.txt`.
 
-Pearl also requires a Gmail account, which is specified by `auth.json`. You need to create and keep this file secret, since it contains your credentials. `auth.json` is structured like so:
+Pearl also requires a Gmail account, which is specified by `auth.json`. You need to create this file and keep it secret, since it contains your credentials. `auth.json` is structured like so:
 ```json
 {
 	"email": "pearl@gmail.com",
@@ -15,11 +15,11 @@ If you choose to fork this repository, make sure to add your filename to `.gitig
 
 `config.json` has additional settings for Pearl:
 * `auth` - Filepath to `auth.json`.
-* `plugins` - List of plugins. The key value is command name and the value is the filepath to the plugin file.
+* `plugins` - List of plugins. For each plugin, The key value is its command name, `path` is its filepath, and `help` is a message for the `help` plugin.
 * `format` - Prefix for identifying commands. For example, `/pearl` tells Pearl to look for messages with the format `/pearl <command>`.
 
-Currently, plugins are only command-based. A plugin file must have a class with a handler function as well as an initialize function. See [hello.py](https://github.com/defund/pearl/blob/master/plugins/hello.py) for a basic example.
+Currently, plugins are only command-based. A plugin file must have a class with a handler function as well as an initialize function. See [plugins](https://github.com/defund/pearl/tree/master/pearl/plugins) for examples.
 
 The easiest way to run Pearl is to run `python3 pearl.py`. If you want Pearl to run permanently, build and run a docker instance with the included `Dockerfile`.
 
-A final technicality to note is that Hangups automatically uses your device's cached token. If you've previously logged into a different account, Hangups will not use the credentials from `auth.json`. If this is the case, run `clean.py` to clear your token cache.
+A final technicality to note is that hangups automatically uses your device's cached token. If you've previously logged into a different account, hangups will not use the credentials from `auth.json`. If this is the case, run `clean.py` to clear your token cache.
