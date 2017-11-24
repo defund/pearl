@@ -34,11 +34,10 @@ class Command:
 	def invite(self, accounts, eid):
 		request = hangups.hangouts_pb2.AddUserRequest(
 			request_header=self.client.get_request_header(),
-			invitee_id=[hangups.hangouts_pb2.InviteeID(gaia_id=account["gaia_id"]) for account in self.accounts if
-						account != self.account],
+			invitee_id=[hangups.hangouts_pb2.InviteeID(gaia_id=account["gaia_id"]) for account in accounts],
 			event_request_header=hangups.hangouts_pb2.EventRequestHeader(
 				conversation_id=hangups.hangouts_pb2.ConversationId(
-					id=self.conversation_id
+					id=eid
 				),
 				client_generated_id=self.client.get_client_generated_id(),
 			),
