@@ -29,7 +29,25 @@ class Command:
 			)
 		)
 		yield from self.client.send_chat_message(request)
+	@asyncio.coroutine
+	def sendImage(self, image, eid):
+		img = self.client.upload_image(image)
+		segment = hangups.ChatMessageSegment.from_str("")
+		request = hangups.hangouts_pb2.SendChatMessageRequest(
+			request_header=self.client.get_request_header(),
+			event_request_header=hangups.hangouts_pb2.EventRequestHeader(
+				conversation_id=hangups.hangouts_pb2.ConversationId(
+					id=eid
+				),
+				client_generated_id=self.client.get_client_generated_id(),
+			),
+			message_content=hangups.hangouts_pb2.MessageContent(
+				segment=[seg.serialize() for seg in segment]
+			)
+		)
+		yield from self.client.send_message(request, img)
 
+		
 	@asyncio.coroutine
 	def invite(self, accounts, eid):
 		request = hangups.hangouts_pb2.AddUserRequest(
