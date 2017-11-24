@@ -2,6 +2,8 @@ import asyncio
 import hangups
 
 from command import Command
+def sendMessage(self,event,message):
+	asyncio.run_coroutine_threadsafe(self.send(message, event.conversation_id.id), self.pearl.loop)
 
 class Hello(Command):
 
@@ -17,7 +19,7 @@ class Hello(Command):
 		self.usage_help = usage_help
 
 	def handle(self, args, event):
-		asyncio.run_coroutine_threadsafe(self.send(self.usage_help, event.conversation_id.id), self.pearl.loop)
+		sendMessage(self, event, self.usage_help)
 
 def initialize(pearl):
 	return Hello(pearl)
