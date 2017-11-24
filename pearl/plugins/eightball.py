@@ -5,6 +5,9 @@ import random
 
 from command import Command
 
+def sendMessage(self,event,message):
+	asyncio.run_coroutine_threadsafe(self.send(message, event.conversation_id.id), self.pearl.loop)
+
 class EightBall(Command):
 
 	answers = [
@@ -36,7 +39,7 @@ class EightBall(Command):
 
 	def handle(self, args, event):
 		answer = random.choice(self.answers)
-		asyncio.run_coroutine_threadsafe(self.send(answer, event.conversation_id.id), self.pearl.loop)
+		sendMessage(self,event,answer)
 
 def initialize(pearl):
 	return EightBall(pearl)
