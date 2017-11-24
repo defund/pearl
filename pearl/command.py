@@ -29,3 +29,18 @@ class Command:
 			)
 		)
 		yield from self.client.send_chat_message(request)
+
+	@asyncio.coroutine
+	def invite(self, accounts, eid):
+		request = hangups.hangouts_pb2.AddUserRequest(
+			request_header=self.client.get_request_header(),
+			invitee_id=[hangups.hangouts_pb2.InviteeID(gaia_id=account["gaia_id"]) for account in self.accounts if
+						account != self.account],
+			event_request_header=hangups.hangouts_pb2.EventRequestHeader(
+				conversation_id=hangups.hangouts_pb2.ConversationId(
+					id=self.conversation_id
+				),
+				client_generated_id=self.client.get_client_generated_id(),
+			),
+		)
+		yield from self.client.add_user(request)
