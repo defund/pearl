@@ -1,5 +1,17 @@
 import enum
 
+class Authenticator(object):
+
+	def __init__(self, email, password):
+		self.email = email
+		self.password = password
+
+	def get_email(self):
+		return self.email
+
+	def get_password(self):
+		return self.password
+
 class EventType(enum.Enum):
 	EVENT_TYPE_UNKNOWN = 0
 	EVENT_TYPE_REGULAR_CHAT_MESSAGE = 1

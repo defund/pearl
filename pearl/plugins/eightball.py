@@ -3,9 +3,9 @@ import hangups
 
 import random
 
-from command import Command
+from interactive import Interactive
 
-class EightBall(Command):
+class EightBall(Interactive):
 
 	answers = [
 		'It is certain',
@@ -32,11 +32,10 @@ class EightBall(Command):
 
 	def __init__(self, pearl):
 		self.pearl = pearl
-		self.client = pearl.client
 
 	def handle(self, args, event):
 		answer = random.choice(self.answers)
-		asyncio.run_coroutine_threadsafe(self.send(answer, event.conversation_id.id), self.pearl.loop)
+		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), answer), self.pearl.loop)
 
 def initialize(pearl):
 	return EightBall(pearl)

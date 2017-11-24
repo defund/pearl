@@ -4,19 +4,28 @@
 	"plugins": {
 		"8ball": {
 			"path": "plugins/eightball.py",
-			"help": "Receive fortune or advice"
+			"help": "Receive fortune or advice",
+			"type": "command"
 		},
 		"about": {
 			"path": "plugins/about.py",
-			"help": "Display general information"
+			"help": "General information",
+			"type": "command"
+		},
+		"firebase": {
+			"auth": "firebase.json",
+			"path": "plugins/firebase.py",
+			"type": "utility"
 		},
 		"hello": {
 			"path": "plugins/hello.py",
-			"help": "Pearl greets you!"
+			"help": "Pearl greets you!",
+			"type": "command"
 		},
 		"help": {
 			"path": "plugins/help.py",
-			"help": "View this menu"
+			"help": "List usage and commands",
+			"type": "command"
 		}
 	}
 }

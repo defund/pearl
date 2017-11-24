@@ -17,8 +17,8 @@ If you choose to fork this repository, make sure to add your filename to `.gitig
 
 `config.json` has additional settings for Pearl:
 * `auth` - Filepath to `auth.json`.
-* `plugins` - List of plugins. For each plugin, The key value is its command name, `path` is its filepath, and `help` is a message for the `help` plugin.
 * `format` - Prefix for identifying commands. For example, `/pearl` tells Pearl to look for messages with the format `/pearl <command>`.
+* `plugins` - List of plugins. For each plugin, The key value is its command name, `path` is its filepath, and `help` is a message for the `help` plugin.
 
 Currently, plugins are only command-based. A plugin file must have a class with a handler function as well as an initialize function. See [plugins](https://github.com/defund/pearl/tree/master/pearl/plugins) for examples.
 
