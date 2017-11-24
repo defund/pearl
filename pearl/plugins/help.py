@@ -12,7 +12,7 @@ class Hello(Command):
 
 	def build(self):
 		usage_help = 'Usage: ' + self.pearl.config['format'] + ' command<br>Commands:'
-		for plugin in self.pearl.config['plugins']:
+		for plugin in self.pearl.plugins:
 			usage_help += '<br><b>' + plugin + '</b>: ' + self.pearl.config['plugins'][plugin]['help']
 		self.usage_help = usage_help
 
