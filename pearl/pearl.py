@@ -59,6 +59,6 @@ class Pearl:
 	def execute(self, message, event):
 		args = message.split()
 		if args[1] in self.commands.keys():
-			asyncio.run_coroutine_threadsafe(self.commands[args[1]].handle(args[2:], event), self.loop)
+			self.commands[args[1]].handle(args[2:], event)
 
 Pearl().run()
