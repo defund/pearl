@@ -19,5 +19,5 @@ class Hello(Command):
 	def handle(self, args, event):
 		asyncio.run_coroutine_threadsafe(self.send(self.usage_help, event.conversation_id.id), self.pearl.loop)
 
-def initialize(client):
-	return Hello(client)
+def initialize(pearl):
+	return Hello(pearl)
