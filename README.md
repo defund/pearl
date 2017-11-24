@@ -1,4 +1,6 @@
 # Pearl
+<p align="center"><img src="pearl.png" width="100"/></p>
+
 Pearl is a lightweight framework for making Google Hangouts bots. It is structured as a set of plugins, which either run passively or respond to commands. For example, the `hello.py` plugin replies with a custom greeting whenever a user sends `/pearl hello`. Pearl's sample plugins are meant to be for a group chat manager, but it's incredibly easy to make custom plugins. Pearl is built on [hangups](https://github.com/tdryer/hangups).
 
 # Setup
@@ -20,6 +22,6 @@ If you choose to fork this repository, make sure to add your filename to `.gitig
 
 Currently, plugins are only command-based. A plugin file must have a class with a handler function as well as an initialize function. See [plugins](https://github.com/defund/pearl/tree/master/pearl/plugins) for examples.
 
-The easiest way to run Pearl is to run `python3 pearl.py`. If you want Pearl to run permanently, build and run a docker instance with the included `Dockerfile`.
+The easiest way to run Pearl is to execute `python3 pearl.py`. If you want Pearl to run permanently, build and run a docker instance with the included `Dockerfile`.
 
 A final technicality to note is that hangups automatically uses your device's cached token. If you've previously logged into a different account, hangups will not use the credentials from `auth.json`. If this is the case, run `clean.py` to clear your token cache.
