@@ -52,7 +52,7 @@ class Pearl:
 	def handle(self, update):
 		event = update.event_notification.event
 		if event.event_type == utils.EventType.EVENT_TYPE_REGULAR_CHAT_MESSAGE.value:
-			message = ''.join([seg.text for seg in event.chat_message.message_content.segment])
+			message = hangups.ChatMessageEvent(event).text
 			if self.pattern.match(message):
 				self.execute(message, event)
 

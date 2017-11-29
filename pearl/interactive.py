@@ -17,10 +17,14 @@ class Interactive:
 	def send(self, conversation, message, image=None):
 		yield from conversation.send_message(hangups.ChatMessageSegment.from_str(message), image_file=image)
 
-	def conversation(self, event=None):
+	def conversation(self, raw=None, event=None):
+		if raw:
+			return self.pearl.conversations.get(raw)
 		if event:
 			return self.pearl.conversations.get(event.conversation_id.id)
 
-	def user(self, uid=None):
+	def user(self, raw=None, uid=None):
+		if raw:
+			return self.pearl.users.get_user(hangups.user.UserID(raw, raw))
 		if uid:
 			return self.pearl.users.get_user(hangups.user.UserID(uid.chat_id, uid.gaia_id))

@@ -4,7 +4,7 @@
 	"plugins": {
 		"8ball": {
 			"path": "plugins/eightball.py",
-			"help": "Receive fortune or advice",
+			"help": "Fortunes and advice",
 			"type": "command"
 		},
 		"about": {
@@ -24,7 +24,12 @@
 		},
 		"help": {
 			"path": "plugins/help.py",
-			"help": "List usage and commands",
+			"help": "Usage and command list",
+			"type": "command"
+		},
+		"user": {
+			"path": "plugins/user.py",
+			"help": "User management",
 			"type": "command"
 		}
 	}

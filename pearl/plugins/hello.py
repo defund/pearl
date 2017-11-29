@@ -10,8 +10,8 @@ class Hello(Interactive):
 
 	def handle(self, args, event):
 		hello = 'Hello!'
-		name = self.user(uid=event.sender_id).full_name.split()[0]
-		hello = 'Hello ' + name + '!'
+		name = self.user(uid=event.sender_id).first_name
+		hello = 'Hello {}!'.format(name)
 				
 		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), hello), self.pearl.loop)
 
