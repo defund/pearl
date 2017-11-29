@@ -1,4 +1,5 @@
 import asyncio
+from firebase_admin import firestore
 import hangups
 import re
 
@@ -23,13 +24,15 @@ class User(Interactive):
 
 	def handle(self, args, event):
 		if not self.database:
-			self.users_ref = self.pearl.plugins['firebase'].db.collection('users')
+			self.user_ref = self.pearl.plugins['firebase'].db.collection('user')
+			self.user_ref.document('username').update({}, firestore.CreateIfMissingOption(True))
 			self.database = True
 
 		if len(args) > 0 and args[0] in self.methods:
 			try:
 				self.methods[args[0]](args[1:], event)
-			except:
+			except Exception as e:
+				print(e)
 				response = 'Sorry, Firebase threw an error. Please try again!'
 				asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 				return
@@ -38,35 +41,44 @@ class User(Interactive):
 			return
 
 	def users(self):
-		docs = self.users_ref.get()
-		users = {}
-		for doc in docs:
-			users[doc.id] = doc.to_dict()
-		return users
+		username_ref = self.user_ref.document('username')
+		return username_ref.get().to_dict()
+
+	def usernames(self):
+		users = self.users()
+		return [users[uid] for uid in users]
+
+	def uid(self, username):
+		users = self.users()
+		for uid in users:
+			if users[uid] == username:
+				return uid
+		return None
 
 	def username(self, uid):
 		users = self.users()
-		for username in users:
-			if 'uid' in users[username] and users[username]['uid'] == uid:
-				return username
+		if uid in users:
+			return users[uid]
 		return None
 
 	def list_method(self, args, event):
-		response = 'User List:'
 		users = self.users()
-		for username in sorted(users.keys()):
-			if 'uid' in users[username]:
-				name = self.user(raw=users[username]['uid']).full_name
-				response += '\n<b>{}</b> ({})'.format(username, name)
+		entries = []
+		for uid in users:
+			entries.append([users[uid], self.user(raw=uid[1:]).full_name])
+		response = 'User List:'
+		for entry in sorted(entries):
+			response += '\n<b>{}</b>: {}'.format(entry[0], entry[1])
 		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 
 
 	def self_method(self, args, event):
-		username = self.username(event.sender_id.gaia_id)
+		uid = 'u' + event.sender_id.gaia_id
+		username = self.username(uid)
 		if username:
 			response = 'You are set to <b>{}</b>.'.format(username)
 		else:
-			response = 'You do not have a username. Create one by sending <i>user set username</i>'
+			response = 'You do not have a username. Create one with the <b>set</b> method.'
 		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 
 	def set_method(self, args, event):
@@ -75,11 +87,13 @@ class User(Interactive):
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
+		usernames = self.usernames()
+		uid = 'u' + event.sender_id.gaia_id
 		new = args[0].lower()
-		old = self.username(event.sender_id.gaia_id)
+		old = self.username(uid)
 		
-		if len(new) < 3 or len(new) > 32:
-			response = 'Username must be between 3 and 32 characters long.'
+		if len(new) < 3 or len(new) > 12:
+			response = 'Username must be between 3 and 12 characters long.'
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
@@ -93,18 +107,15 @@ class User(Interactive):
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
-		if new in self.users():
+		if new in usernames:
 			response = 'Sorry, <b>{}</b> is already taken.'.format(new)
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
-		if old:
-			self.users_ref.document(old).delete()
-
-		doc_ref = self.users_ref.document(new)
-		doc_ref.set({
-			'uid': event.sender_id.gaia_id
-		})
+		username_ref = self.user_ref.document('username')
+		username_ref.update({
+			uid: new
+		}, firestore.CreateIfMissingOption(True))
 		response = 'You are now set to <b>{}</b>!'.format(new)
 		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 
