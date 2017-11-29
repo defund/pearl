@@ -6,14 +6,19 @@ from interactive import Interactive
 
 class User(Interactive):
 
+	usage = 'Methods:\n' + \
+			'<b>list</b>: List users in chat\n' + \
+			'<b>self</b>: View your profile\n' + \
+			'<b>set</b>: Set your username'
+
 	def __init__(self, pearl):
 		self.pearl = pearl
 
 		self.database = False
 		self.methods = {
+			'list': self.list_method,
 			'self': self.self_method, 
-			'set': self.set_method,
-			'list': self.list_method
+			'set': self.set_method
 		}
 
 	def handle(self, args, event):
@@ -22,7 +27,15 @@ class User(Interactive):
 			self.database = True
 
 		if len(args) > 0 and args[0] in self.methods:
-			self.methods[args[0]](args[1:], event)
+			try:
+				self.methods[args[0]](args[1:], event)
+			except:
+				response = 'Sorry, Firebase threw an error. Please try again!'
+				asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
+				return
+		else:
+			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), self.usage), self.pearl.loop)
+			return
 
 	def users(self):
 		docs = self.users_ref.get()
@@ -37,6 +50,16 @@ class User(Interactive):
 			if 'uid' in users[username] and users[username]['uid'] == uid:
 				return username
 		return None
+
+	def list_method(self, args, event):
+		response = 'User List:'
+		users = self.users()
+		for username in sorted(users.keys()):
+			if 'uid' in users[username]:
+				name = self.user(raw=users[username]['uid']).full_name
+				response += '\n<b>{}</b> ({})'.format(username, name)
+		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
+
 
 	def self_method(self, args, event):
 		username = self.username(event.sender_id.gaia_id)
@@ -83,15 +106,6 @@ class User(Interactive):
 			'uid': event.sender_id.gaia_id
 		})
 		response = 'You are now set to <b>{}</b>!'.format(new)
-		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
-
-	def list_method(self, args, event):
-		response = 'User List:'
-		users = self.users()
-		for username in sorted(users.keys()):
-			if 'uid' in users[username]:
-				name = self.user(raw=users[username]['uid']).full_name
-				response += '\n<b>{}</b> ({})'.format(username, name)
 		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 
 def initialize(pearl):
