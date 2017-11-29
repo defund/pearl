@@ -83,8 +83,8 @@ class User(Interactive):
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
-		if not re.match('^\w+$', new):
-			response = 'Username must only contain alphanumerics or underscores.'
+		if not re.match('^[a-zA-Z0-9]*$', new):
+			response = 'Username must only contain alphanumeric characters.'
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
