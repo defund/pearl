@@ -23,10 +23,8 @@ class User(Interactive):
 		}
 
 	def handle(self, args, event):
-		if not self.database:
-			self.user_ref = self.pearl.plugins['firebase'].db.collection('user')
-			self.user_ref.document('username').update({}, firestore.CreateIfMissingOption(True))
-			self.database = True
+		self.user_ref = self.pearl.plugins['firebase'].db.collection('user')
+		self.user_ref.document('username').update({}, firestore.CreateIfMissingOption(True))
 
 		if len(args) > 0 and args[0] in self.methods:
 			try:
