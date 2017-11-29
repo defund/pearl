@@ -4,5 +4,6 @@ ADD pearl/ /pearl/
 WORKDIR /pearl/
 
 RUN pip install -r requirements.txt
+RUN pip install --upgrade protobuf
 
 CMD [ "python", "pearl.py" ]
