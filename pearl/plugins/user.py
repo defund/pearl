@@ -32,7 +32,7 @@ class User(Interactive):
 			except:
 				return
 		else:
-			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=self.event), self.usage), self.pearl.loop)
+			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), self.usage), self.pearl.loop)
 			return
 
 	def dbcall(self, event, call, repeat=1):
@@ -82,7 +82,7 @@ class User(Interactive):
 
 
 	def self_method(self, args, event):
-		uid = 'u' + self.event.sender_id.gaia_id
+		uid = 'u' + event.sender_id.gaia_id
 		username = self.username(event, uid)
 		if username:
 			response = 'You are set to <b>{}</b>.'.format(username)
