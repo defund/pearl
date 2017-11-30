@@ -32,7 +32,7 @@ class User(Interactive):
 			except:
 				return
 		else:
-			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), self.usage), self.pearl.loop)
+			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=self.event), self.usage), self.pearl.loop)
 			return
 
 	def dbcall(self, event, call, repeat=1):
@@ -40,7 +40,7 @@ class User(Interactive):
 			return call()
 		except:
 			if repeat:
-				return self.dbcall(call, repeat=repeat-1)
+				return self.dbcall(event, call, repeat=repeat-1)
 			else:
 				self.dbthrow(event)
 
@@ -49,29 +49,29 @@ class User(Interactive):
 		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 		raise Exception
 
-	def users(self):
+	def users(self, event):
 		username_ref = self.dbcall(event, lambda: self.user_ref.document('username'))
 		return username_ref.get().to_dict()
 
-	def usernames(self):
+	def usernames(self, event):
 		users = self.users()
 		return [users[uid] for uid in users]
 
-	def uid(self, username):
-		users = self.users()
+	def uid(self, event, username):
+		users = self.users(event)
 		for uid in users:
 			if users[uid] == username:
 				return uid
 		return None
 
-	def username(self, uid):
-		users = self.users()
+	def username(self, event, uid):
+		users = self.users(event)
 		if uid in users:
 			return users[uid]
 		return None
 
 	def list_method(self, args, event):
-		users = self.users()
+		users = self.users(event)
 		entries = []
 		for uid in users:
 			entries.append([users[uid], self.user(raw=uid[1:]).full_name])
@@ -82,8 +82,8 @@ class User(Interactive):
 
 
 	def self_method(self, args, event):
-		uid = 'u' + event.sender_id.gaia_id
-		username = self.username(uid)
+		uid = 'u' + self.event.sender_id.gaia_id
+		username = self.username(event, uid)
 		if username:
 			response = 'You are set to <b>{}</b>.'.format(username)
 		else:
@@ -96,10 +96,10 @@ class User(Interactive):
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
-		usernames = self.usernames()
+		usernames = self.usernames(event)
 		uid = 'u' + event.sender_id.gaia_id
 		new = args[0].lower()
-		old = self.username(uid)
+		old = self.username(event, uid)
 		
 		if len(new) < 3 or len(new) > 12:
 			response = 'Username must be between 3 and 12 characters long.'
@@ -121,7 +121,7 @@ class User(Interactive):
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
-		self.dbcall(event, lambda: self.user_ref.document('username').update({
+		self.dbcall(lambda: self.user_ref.document('username').update({
 			uid: new
 		}, firestore.CreateIfMissingOption(True)))
 		response = 'You are now set to <b>{}</b>!'.format(new)
