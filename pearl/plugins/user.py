@@ -23,12 +23,11 @@ class User(Interactive):
 		}
 
 	def handle(self, args, event):
-
 		if len(args) > 0 and args[0] in self.methods:
 			try:
 				if not self.user_ref:
 					self.user_ref = self.pearl.plugins['firebase'].db.collection('user')
-					self.dbcall(lambda: self.user_ref.document('username').update({}, firestore.CreateIfMissingOption(True)))
+					self.dbcall(event, lambda: self.user_ref.document('username').update({}, firestore.CreateIfMissingOption(True)))
 				self.methods[args[0]](args[1:], event)
 			except:
 				return
@@ -36,22 +35,22 @@ class User(Interactive):
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), self.usage), self.pearl.loop)
 			return
 
-	def dbcall(self, call, repeat=1):
+	def dbcall(self, event, call, repeat=1):
 		try:
 			return call()
 		except:
 			if repeat:
 				return self.dbcall(call, repeat=repeat-1)
 			else:
-				self.dbthrow()
+				self.dbthrow(event)
 
-	def dbthrow(self):
+	def dbthrow(self, event):
 		response = 'Sorry, Firebase threw an error. Please try again!'
 		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 		raise Exception
 
 	def users(self):
-		username_ref = self.dbcall(lambda: self.user_ref.document('username'))
+		username_ref = self.dbcall(event, lambda: self.user_ref.document('username'))
 		return username_ref.get().to_dict()
 
 	def usernames(self):
@@ -122,7 +121,7 @@ class User(Interactive):
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
-		self.dbcall(lambda: self.user_ref.document('username').update({
+		self.dbcall(event, lambda: self.user_ref.document('username').update({
 			uid: new
 		}, firestore.CreateIfMissingOption(True)))
 		response = 'You are now set to <b>{}</b>!'.format(new)
