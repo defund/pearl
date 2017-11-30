@@ -54,7 +54,7 @@ class User(Interactive):
 		return username_ref.get().to_dict()
 
 	def usernames(self, event):
-		users = self.users()
+		users = self.users(event)
 		return [users[uid] for uid in users]
 
 	def uid(self, event, username):
@@ -121,7 +121,7 @@ class User(Interactive):
 			asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), response), self.pearl.loop)
 			return
 
-		self.dbcall(lambda: self.user_ref.document('username').update({
+		self.dbcall(event, lambda: self.user_ref.document('username').update({
 			uid: new
 		}, firestore.CreateIfMissingOption(True)))
 		response = 'You are now set to <b>{}</b>!'.format(new)
