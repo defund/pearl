@@ -40,6 +40,7 @@ class Pearl:
 
 	def run(self):
 		self.client.on_connect.add_observer(self.initialize)
+		self.client.on_state_update.add_observer(self.active)
 		self.client.on_state_update.add_observer(self.handle)
 		self.loop = asyncio.get_event_loop()
 		self.loop.run_until_complete(self.client.connect())
@@ -49,9 +50,21 @@ class Pearl:
 		self.users, self.conversations = yield from hangups.build_user_conversation_list(self.client)
 
 	@asyncio.coroutine
+	def active(self, update):
+		event = update.event_notification.event
+		if event.event_type == hangups.hangouts_pb2.EVENT_TYPE_REGULAR_CHAT_MESSAGE:
+			request = hangups.hangouts_pb2.SetFocusRequest(
+				request_header=self.client.get_request_header(),
+				conversation_id=event.conversation_id,
+				type=hangups.hangouts_pb2.FOCUS_TYPE_FOCUSED,
+				timeout_secs=5*60
+			)
+			yield from self.client.set_focus(request)
+
+	@asyncio.coroutine
 	def handle(self, update):
 		event = update.event_notification.event
-		if event.event_type == utils.EventType.EVENT_TYPE_REGULAR_CHAT_MESSAGE.value:
+		if event.event_type == hangups.hangouts_pb2.EVENT_TYPE_REGULAR_CHAT_MESSAGE:
 			message = hangups.ChatMessageEvent(event).text
 			if self.pattern.match(message):
 				self.execute(message, event)

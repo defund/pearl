@@ -1,2 +1,3 @@
 hangups
 firebase-admin
+protobuf

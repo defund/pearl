@@ -14,9 +14,21 @@ class Interactive:
 		...
 
 	@asyncio.coroutine
-	def send(self, conversation, message, image=None):
-		yield from conversation.send_message(hangups.ChatMessageSegment.from_str(message), image_file=image)
-
+	def send(self, conversation, message, annotate=True):
+		request = hangups.hangouts_pb2.SendChatMessageRequest(
+			request_header=self.pearl.client.get_request_header(),
+			event_request_header=conversation._get_event_request_header(),
+			message_content=hangups.hangouts_pb2.MessageContent(
+				segment=[seg.serialize() for seg in hangups.ChatMessageSegment.from_str(message)]
+			),
+			annotation=[hangups.hangouts_pb2.EventAnnotation(
+				type=4
+			)]
+		)
+		if not annotate:
+			request.annotation[0].type = 0
+		yield from self.pearl.client.send_chat_message(request)
+		
 	def conversation(self, raw=None, event=None):
 		if raw:
 			return self.pearl.conversations.get(raw)
