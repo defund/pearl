@@ -1,4 +1,4 @@
-class Authenticator(object):
+class Authenticator:
 
 	def __init__(self, email, password):
 		self.email = email

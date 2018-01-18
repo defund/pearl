@@ -1,26 +1,26 @@
 {
-	"auth": "auth.json",
+	"auth": "private/auth.json",
 	"format": "/pearl",
 	"plugins": {
 		"8ball": {
-			"help": "Fortunes and advice",
-			"path": "plugins/eightball.py",
-			"type": "command"
+			"path": "plugins/eightball.py"
 		},
 		"about": {
-			"help": "General information",
-			"path": "plugins/about.py",
-			"type": "command"
+			"path": "plugins/about.py"
 		},
 		"hello": {
-			"help": "Pearl greets you!",
-			"path": "plugins/hello.py",
-			"type": "command"
+			"path": "plugins/hello.py"
 		},
 		"help": {
-			"help": "Usage and command list",
 			"path": "plugins/help.py",
-			"type": "command"
+			"help": "Usage and command list",
+			"commands": {
+				"8ball": "Fortunes and advice",
+				"about": "General information",
+				"blackjack": "Play blackjack",
+				"hello": "Pearl greets you!",
+				"help": "Usage and command list"
+			}
 		}
 	}
 }

@@ -1,17 +1,33 @@
 import asyncio
-import hangups
 
-from interactive import Interactive
+import nacre
 
-class About(Interactive):
+class AboutSession:
 
-	about = 'Pearl is a bot framework for Google Hangouts. You can view source code at https://github.com/defund/pearl. Thanks!'
+	about = "Pearl is a bot framework for Google Hangouts. You can view source code at https://github.com/defund/pearl. Thanks!"
 
-	def __init__(self, pearl):
+	def __init__(self, pearl, config):
 		self.pearl = pearl
+		self.hangouts = self.pearl.hangouts
+		self.config = config
+		self.buildHandle()
 
-	def handle(self, args, event):
-		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), self.about), self.pearl.loop)
+	def build(self):
+		pass
 
-def initialize(pearl):
-	return About(pearl)
+	def buildHandle(self):
+		messageFilter = nacre.handle.newMessageFilter('^{}\s+about(\s.*)?$'.format(self.pearl.config['format']))
+		async def handle(update):
+			if nacre.handle.isMessageEvent(update):
+				event = update.event_notification.event
+				if messageFilter(event):
+					await self.respond(event)
+		self.pearl.updateEvent.addListener(handle)
+
+	async def respond(self, event):
+		message = self.about
+		conversation = self.hangouts.getConversation(event=event)
+		await self.hangouts.send(message, conversation)
+
+def load(pearl, config):
+	return AboutSession(pearl, config)

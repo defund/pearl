@@ -1,79 +1,46 @@
-import asyncio, bisect, importlib, json, os, re, sys
+import asyncio, importlib, json, os
 
 import hangups
-import appdirs
-
-import utils
+import nacre
 
 class Pearl:
 
-	def __init__(self):
-		self.load_config()
-		self.client = hangups.client.Client(self.login())
-		self.load_commands()
+	def __init__(self, auth, config):
+		self.auth = auth
+		self.config = config
+		self.client = hangups.client.Client(self.authenticate())
+		self.hangouts = nacre.hangouts.Hangouts(self.client)
+		self.updateEvent = nacre.event.Event()
+		self.load()
 
-	def login(self):
-		dirs = appdirs.AppDirs('hangups', 'hangups')
-		token = hangups.RefreshTokenCache(os.path.join(dirs.user_cache_dir, 'refresh_token.txt'))
-		return hangups.get_auth(utils.Authenticator(self.auth['email'], self.auth['password']), token)
+	def authenticate(self):
+		authenticator = nacre.auth.Authenticator(self.auth['email'], self.auth['password'])
+		token = hangups.RefreshTokenCache(os.path.join(os.getcwd(), self.auth['token']))
+		return hangups.get_auth(authenticator, token)
 
-	def load_config(self):
-		self.config = json.load(open('config.json'))
-		self.auth = json.load(open(self.config['auth']))
-
-	def load_commands(self):
-		self.pattern = re.compile('^' + self.config['format'] + ' [a-zA-Z0-9_]')
-
-		pluginlist = {'command': [], 'passive': [], 'utility': []}
-		for plugin in self.config['plugins']:
-			bisect.insort(pluginlist[self.config['plugins'][plugin]['type']], plugin)
-		self.pluginlist = pluginlist
-
-		plugins = {}
-		for plugin in self.config['plugins']:
-			path = os.path.join(os.getcwd(), self.config['plugins'][plugin]['path'])
-			spec = importlib.util.spec_from_file_location(plugin, path)
-			handler = importlib.util.module_from_spec(spec)
-			spec.loader.exec_module(handler)
-			plugins[plugin] = handler.initialize(self)
-		self.plugins = plugins
+	def load(self):
+		self.plugins = {}
+		plugins = self.config['plugins']
+		for name in plugins:
+			path = os.path.join(os.getcwd(), plugins[name]['path'])
+			spec = importlib.util.spec_from_file_location(name, path)
+			module = importlib.util.module_from_spec(spec)
+			spec.loader.exec_module(module)
+			self.plugins[name] = module.load(self, plugins[name])
+		for name in plugins:
+			self.plugins[name].build()
 
 	def run(self):
-		self.client.on_connect.add_observer(self.initialize)
-		self.client.on_state_update.add_observer(self.active)
-		self.client.on_state_update.add_observer(self.handle)
-		self.loop = asyncio.get_event_loop()
-		self.loop.run_until_complete(self.client.connect())
+		self.client.on_connect.add_observer(self.hangouts.start)
+		self.client.on_state_update.add_observer(self.updateEvent.fire)
+		loop = asyncio.get_event_loop()
+		loop.run_until_complete(self.client.connect())
+		loop.close()
 
-	@asyncio.coroutine
-	def initialize(self):
-		self.users, self.conversations = yield from hangups.build_user_conversation_list(self.client)
+def main():
+	config = json.load(open('config.json'))
+	auth = json.load(open(config['auth']))
+	Pearl(auth, config).run()
 
-	@asyncio.coroutine
-	def active(self, update):
-		event = update.event_notification.event
-		if event.event_type == hangups.hangouts_pb2.EVENT_TYPE_REGULAR_CHAT_MESSAGE:
-			request = hangups.hangouts_pb2.SetFocusRequest(
-				request_header=self.client.get_request_header(),
-				conversation_id=event.conversation_id,
-				type=hangups.hangouts_pb2.FOCUS_TYPE_FOCUSED,
-				timeout_secs=5*60
-			)
-			yield from self.client.set_focus(request)
-
-	@asyncio.coroutine
-	def handle(self, update):
-		event = update.event_notification.event
-		if event.event_type == hangups.hangouts_pb2.EVENT_TYPE_REGULAR_CHAT_MESSAGE:
-			message = hangups.ChatMessageEvent(event).text
-			if self.pattern.match(message):
-				self.execute(message, event)
-
-	def execute(self, message, event):
-		command = message.split()
-		plugin = command[1]
-		args = command[2:]
-		if plugin in self.pluginlist['command']:
-			self.plugins[plugin].handle(args, event)
-
-Pearl().run()
+if __name__ == '__main__':
+	main()

@@ -1,20 +1,37 @@
 import asyncio
-import hangups
 
-from interactive import Interactive
+import nacre
 
-class Help(Interactive):
+class HelpSession:
 
-	def __init__(self, pearl):
+	def __init__(self, pearl, config):
 		self.pearl = pearl
+		self.hangouts = self.pearl.hangouts
+		self.config = config
+		self.buildUsage()
+		self.buildHandle()
 
-		usage_help = 'Usage: {} command<br>Commands:'.format(self.pearl.config['format'])
-		for plugin in self.pearl.pluginlist['command']:
-			usage_help += '<br><b>{}</b>: {}'.format(plugin, self.pearl.config['plugins'][plugin]['help'])
-		self.usage_help = usage_help		
+	def build(self):
+		pass
 
-	def handle(self, args, event):
-		asyncio.run_coroutine_threadsafe(self.send(self.conversation(event=event), self.usage_help), self.pearl.loop)
+	def buildUsage(self):
+		self.usage = "Usage: {} command<br>Commands:".format(self.pearl.config['format'])
+		for command in self.config['commands']:
+			self.usage += '<br><b>{}</b>: {}'.format(command, self.config['commands'][command])
 
-def initialize(pearl):
-	return Help(pearl)
+	def buildHandle(self):
+		messageFilter = nacre.handle.newMessageFilter('^{}\s+help(\s.*)?$'.format(self.pearl.config['format']))
+		async def handle(update):
+			if nacre.handle.isMessageEvent(update):
+				event = update.event_notification.event
+				if messageFilter(event):
+					await self.respond(event)
+		self.pearl.updateEvent.addListener(handle)
+
+	async def respond(self, event):
+		message = self.usage
+		conversation = self.hangouts.getConversation(event=event)
+		await self.hangouts.send(message, conversation)
+
+def load(pearl, config):
+	return HelpSession(pearl, config)
