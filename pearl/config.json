@@ -17,7 +17,6 @@
 			"commands": {
 				"8ball": "Fortunes and advice",
 				"about": "General information",
-				"blackjack": "Play blackjack",
 				"hello": "Pearl greets you!",
 				"help": "Usage and command list"
 			}
