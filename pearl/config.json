@@ -13,7 +13,6 @@
 		},
 		"help": {
 			"path": "plugins/help.py",
-			"help": "Usage and command list",
 			"commands": {
 				"8ball": "Fortunes and advice",
 				"about": "General information",
