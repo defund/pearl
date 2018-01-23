@@ -6,11 +6,12 @@ Pearl is a lightweight framework for making Google Hangouts bots. It is structur
 # Prerequisites
 Pearl requires a Gmail account, which you must independently create. Pearl does not support accounts with two factor authentication. Once you've made an account, add it to conversations that you would like it to interact with.
 
-In the `pearl` directory, create a new directory called `private`. Inside, create two files, `auth.json` and `token.txt`. Write the following to `auth.json`, but with your own credentials:
+In the `pearl` directory, create a new directory called `private`. Inside, create two files, `auth.json` and `token.txt`. Write the following to `auth.json`, but with your own credentials. If you have two-factor authentication enabled, include it in the `secret` field; otherwise, leave it as an empty string.
 ```json
 {
 	"email": "pearl@gmail.com",
 	"password": "pearl",
+	"secret": "",
 	"token": "private/token.txt"
 }
 ```

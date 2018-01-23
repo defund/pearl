@@ -14,7 +14,7 @@ class Pearl:
 		self.load()
 
 	def authenticate(self):
-		authenticator = nacre.auth.Authenticator(self.auth['email'], self.auth['password'])
+		authenticator = nacre.auth.Authenticator(self.auth['email'], self.auth['password'], self.auth['secret'])
 		token = hangups.RefreshTokenCache(os.path.join(os.getcwd(), self.auth['token']))
 		return hangups.get_auth(authenticator, token)
 
