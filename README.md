@@ -17,7 +17,7 @@ In the `pearl` directory, create a new directory called `private`. Inside, creat
 ```
 
 # Running
-All it takes to get Pearl up and running is `python pearl.py`. For a permanent bot, we recommend that you build and run a Docker instance from the given `Dockerfile`. On some servers, Google may block login requests that Pearl makes. In these situations, first run Pearl on your home computer; you should then see a session cookie stored in `token.txt`. With the session cookie, you will be able to connect to Hangouts on any server.
+All it takes to get Pearl up and running is `python pearl.py`. The easiest way to permanently run a bot is to build and run a Docker instance from the given `Dockerfile`. On some servers, Google may block login requests that Pearl makes. In these situations, first run Pearl on your home computer; you should then see a session cookie stored in `token.txt`. With the session cookie, you will be able to connect to Hangouts on any server.
 
 In a conversation with Pearl, try sending `/pearl help`. Pearl should respond with a set of available commands.
 
