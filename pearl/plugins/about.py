@@ -4,7 +4,7 @@ import nacre
 
 class AboutSession:
 
-	about = "Pearl is a bot framework for Google Hangouts. You can view source code at https://github.com/defund/pearl. Thanks!"
+	about = "Pearl is a bot framework for Google Hangouts. You can view source code at https://github.com/defund/pearl - thanks!"
 
 	def __init__(self, pearl, config):
 		self.pearl = pearl
