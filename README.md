@@ -6,6 +6,9 @@ Pearl is a framework for making Google Hangouts bots. It is structured as a set 
 ## Prerequisites
 Pearl requires a Gmail account, which you must independently create. Once you've made an account, add it to conversations that you would like it to interact with.
 
+NOTE: Please do NOT commit your `private/` to version control.
+The provided `.gitignore` should ignore `pearl/private`.
+
 In the `pearl` directory, create a new directory called `private`. Inside, create two files, `auth.json` and `token.txt`. Write the following to `auth.json`, but with your own credentials. If you have two-factor authentication enabled, include it in the `secret` field; otherwise, leave it as an empty string.
 ```json
 {
@@ -17,7 +20,9 @@ In the `pearl` directory, create a new directory called `private`. Inside, creat
 ```
 
 ## Running
-All it takes to get Pearl up and running is `python pearl.py`. The easiest way to permanently run a bot is to build and run a Docker instance from the given `Dockerfile`. On some servers, Google may block login requests that Pearl makes. In these situations, first run Pearl on your home computer; you should then see a session cookie stored in `token.txt`. With the session cookie, you will be able to connect to Hangouts on any server.
+All it takes to get Pearl up and running is `python pearl.py`. The easiest way to permanently run a bot is to build and run a Docker instance from the given `Dockerfile`.
+
+On some servers, Google may block login requests that Pearl makes. In these situations, first run Pearl on your home computer; you should then see a session cookie stored in `token.txt`. With the session cookie, you will be able to connect to Hangouts on any server.
 
 If the program throws an error when generating the token, manually create one from these [instructions](https://github.com/tdryer/hangups/issues/350#issuecomment-323553771) and place it in `token.txt`.
 
